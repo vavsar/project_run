@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+COMPANY_NAME = 'Придумай название сам'
+SLOGAN = 'Придумай слоган сам'
+CONTACTS = 'Придумай контакты сам'
 
 # Application definition
 
