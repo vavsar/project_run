@@ -21,12 +21,12 @@ def company_details(request):
 
 
 class RunViewSet(ModelViewSet):
-    queryset = Run.objects.all()
+    queryset = Run.objects.select_related('athlete')
     serializer_class = RunSerializer
 
 
 class UsersViewSet(ReadOnlyModelViewSet):
-    queryset = User.objects.select_related('athlete')
+    queryset = User.objects.all()
     serializer_class = UsersSerializer
     filter_backends = [SearchFilter]
     search_fields = ['first_name', 'last_name']
