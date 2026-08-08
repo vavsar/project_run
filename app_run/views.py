@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework.decorators import api_view
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -27,6 +28,8 @@ class RunViewSet(ModelViewSet):
 class UsersViewSet(ReadOnlyModelViewSet):
     queryset = User.objects.select_related('athlete')
     serializer_class = UsersSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name']
 
     def get_queryset(self):
         qs = self.queryset
