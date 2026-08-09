@@ -1,13 +1,15 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework.decorators import api_view
+from rest_framework import status
+from rest_framework.decorators import api_view, action
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from app_run.enums import UserType
-from app_run.models import Run
+from app_run.models import Run, RunStatusEnum
 from app_run.serializers import RunSerializer, UsersSerializer
 
 
@@ -23,6 +25,34 @@ def company_details(request):
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.select_related('athlete')
     serializer_class = RunSerializer
+
+    @action(detail=True, methods=['post'])
+    def start(self, request, pk):
+        run = self.get_object()
+        if run.status == RunStatusEnum.INIT:
+            run.status = RunStatusEnum.IN_PROGRESS
+            run.save()
+        else:
+            return Response(
+                {'error': 'Run is already running'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {"message": "запрос обработан"}
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def stop(self, request, pk):
+        run = self.get_object()
+        if run.status == RunStatusEnum.IN_PROGRESS:
+            run.status = RunStatusEnum.FINISHED
+            run.save()
+        else:
+            return Response(
+                {'error': 'Run is already running'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {"message": "запрос обработан"}
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class UsersViewSet(ReadOnlyModelViewSet):
@@ -45,5 +75,3 @@ class UsersViewSet(ReadOnlyModelViewSet):
         qs = qs.filter(qs_filter).exclude(is_superuser=True)
 
         return qs
-
-
