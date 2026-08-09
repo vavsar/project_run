@@ -2,9 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .enums import UserType
-from .models import Run
-
-
+from .models import Run, RunStatusEnum
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -27,7 +25,7 @@ class UsersSerializer(serializers.ModelSerializer):
         return UserType.COACH if obj.is_staff else UserType.ATHLETE
 
     def get_runs_finished(self, obj):
-        return obj.runs_set.filter(is_finished=True).count()
+        return obj.run_set.filter(status=RunStatusEnum.FINISHED).count()
 
 
 class AthleteSerializer(serializers.ModelSerializer):
